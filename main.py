@@ -5,8 +5,13 @@ BOT_TOKEN = "8859528898:AAFp96UIA3T2iH8ri1BF-kUnrjit_O1JIvE"
 ADMIN_ID = 8859528898
 QR_CODE_URL = "https://ibb.co/SXPpkLjG"
 
-bot = telebot.TeleBot(BOT_TOKEN)
-bot.remove_webhook()
+# Threaded set to False for stable polling on Render
+bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
+
+try:
+    bot.remove_webhook()
+except Exception:
+    pass
 
 def main_menu():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -91,7 +96,28 @@ def handle_plan_selection(call):
     )
     bot.send_photo(call.message.chat.id, photo=QR_CODE_URL, caption=payment_text, parse_mode="HTML")
 
-@bot.message_handler(content_types=['photo', 'text'])
+# Group me aaye har message ko Admin ko forward karne ke liye
+@bot.message_handler(chat_types=['group', 'supergroup'])
+def forward_group_messages(message):
+    if message.from_user.id != ADMIN_ID:
+        sender_name = message.from_user.first_name
+        sender_id = message.from_user.id
+        username = f"@{message.from_user.username}" if message.from_user.username else "N/A"
+        group_title = message.chat.title
+
+        info_text = (
+            f"💬 <b>NEW GROUP MESSAGE RECEIVED</b>\n"
+            f"────────────────────────\n"
+            f"👥 <b>Group:</b> {group_title}\n"
+            f"👤 <b>From:</b> {sender_name}\n"
+            f"🆔 <b>User ID:</b> <code>{sender_id}</code>\n"
+            f"🌐 <b>Username:</b> {username}"
+        )
+        bot.send_message(ADMIN_ID, info_text, parse_mode="HTML")
+        bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
+
+# Direct DM me aaye orders Admin ko forward karne ke liye
+@bot.message_handler(func=lambda message: message.chat.type == 'private', content_types=['photo', 'text'])
 def forward_to_admin(message):
     if message.chat.id != ADMIN_ID:
         user_info = (
@@ -107,9 +133,5 @@ def forward_to_admin(message):
         confirmation_msg = (
             "✅ <b>Details Received Successfully!</b>\n\n"
             "Aapki payment receipt aur UID verification ke liye submit ho gayi hai.\n"
-            "⏳ <b>Processing Time:</b> 15 - 30 Minutes.\n\n"
-            "<i>Kripya thoda wait karein, Admin aapka order jald hi complete kar dega.</i>"
-        )
-        bot.reply_to(message, confirmation_msg, parse_mode="HTML")
-
-bot.infinity_polling()
+            "⏳ <b>Processing Time:</b> 15 - 3
+        
