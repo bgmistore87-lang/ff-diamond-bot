@@ -1,26 +1,4 @@
-import telebot
-from telebot import types
-
-BOT_TOKEN = "8859528898:AAFp96UIA3T2iH8ri1BF-kUnrjit_O1JIvE"
-ADMIN_ID = 8859528898
-QR_CODE_URL = "https://ibb.co/SXPpkLjG"
-
-# Threaded set to False for stable polling on Render
-bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
-
-try:
-    bot.remove_webhook()
-except Exception:
-    pass
-
-def main_menu():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton("💎 Buy Free Fire Diamonds")
-    btn2 = types.KeyboardButton("📜 Pricing & Offers")
-    btn3 = types.KeyboardButton("📞 Customer Support")
-    btn4 = types.KeyboardButton("ℹ️ How It Works")
-    markup.add(btn1, btn2, btn3, btn4)
-    return markup
+q
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -134,4 +112,5 @@ def forward_to_admin(message):
             "✅ <b>Details Received Successfully!</b>\n\n"
             "Aapki payment receipt aur UID verification ke liye submit ho gayi hai.\n"
             "⏳ <b>Processing Time:</b> 15 - 3
+
         
